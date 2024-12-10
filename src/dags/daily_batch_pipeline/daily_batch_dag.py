@@ -29,12 +29,14 @@ with DAG(
         --name "data-processing-cluster" \
         --release-label emr-6.12.0 \
         --applications Name=Spark \
-        --ec2-attributes InstanceProfile=EMR_EC2_DefaultRole,SubnetId=subnet-12345678 \
-        --instance-groups '[{"InstanceCount":1,"InstanceGroupType":"MASTER","InstanceType":"m5.xlarge"},{"InstanceCount":2,"InstanceGroupType":"CORE","InstanceType":"m5.xlarge"}]' \
-        --log-uri "s3://emr-logs-bucket/logs/" \
-        --bootstrap-actions Path="s3://bootstrap-bucket/emr_bootstrap.sh" \
-        --use-default-roles
-        """
+        --ec2-attributes InstanceProfile=emr-cluster-role,SubnetId=subnet-02d277817ea4e40d8 \
+        --instance-groups '[{"InstanceCount":1,"InstanceGroupType":"MASTER","InstanceType":"t2.micro"},{"InstanceCount":2,"InstanceGroupType":"CORE","InstanceType":"t2.micro"}]' \
+        --log-uri "s3://restricted-astra-files/logs/" \
+        --bootstrap-actions Path="s3://restricted-astra-files/scripts/emr_bootstrap.sh" \
+        --use-default-roles \
+        --query 'ClusterId' --output text
+        """,
+        do_xcom_push=True,
     )
 
     # Submit Spark job
@@ -48,7 +50,7 @@ with DAG(
           "ActionOnFailure":"TERMINATE_CLUSTER",
           "HadoopJarStep":{
             "Jar":"command-runner.jar",
-            "Args":["spark-submit","s3://code-bucket/spark_workflow.py"]
+            "Args":["spark-submit","s3://restricted-astra-files/scripts/spark_workflow.py"]
           }
         }]'
         """
