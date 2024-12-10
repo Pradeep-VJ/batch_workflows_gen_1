@@ -1,11 +1,12 @@
 aws:
   region: "us-east-1"
   s3_buckets:
-    source: "source-data-bucket"
-    destination: "destination-data-bucket"
-    logs: "emr-logs-bucket"
+    source: "inbound-astra-files"  # Replace with your actual source bucket
+    destination: "outgoing-astra-files"  # Replace with your destination bucket
+    logs: "restricted-astra-files"  # This should match the bucket in Terraform for logs and bootstrap files
+
 emr:
-  cluster_name: "data-processing-cluster"
+  cluster_name: "daily_batch_emr_cluster"
   release_label: "emr-6.12.0"
-  instance_type: "m5.xlarge"
-  instance_count: 2
+  instance_type: "t2.micro"  # Free Tier instance type
+  instance_count: 2  # This should match the core node count in Terraform
